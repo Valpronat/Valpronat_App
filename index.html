@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Séchage Valpronat</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <img src="media/valpronat-logo.png" alt="Logo Valpronat" class="logo-valpronat-header">
+        <div class="header-banner">Mon Séchage en Grange</div>
+    </header>
+
+    <div id="connection-status">Connexion au serveur...</div>
+
+    <main class="dashboard">
+        <div class="status-grid">
+            <div class="indicator-card">
+                <div class="label-box">Chauffe Eau</div>
+                <div id="ce-led" class="led led-off">OFF</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="label-box">Radiateur</div>
+                <div id="rad-led" class="led led-off">OFF</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="label-box">Test</div>
+                <div id="test-led" class="led led-off">OFF</div>
+            </div>
+
+            <div class="indicator-card">
+                <div class="label-box">Communication</div>
+                <div id="com-led" class="led led-off">OFF</div>
+            </div>
+        </div>
+
+        <section class="visuals-single">
+            <img src="media/sechage-logo.png" alt="Schéma Séchage" class="sechage-banner-single">
+        </section>
+        
+        <h2 id="main-title">SÉCHAGE</h2>
+        <p id="main-status">ATTENTE DONNÉES...</p>
+    </main>
+
+    <script>
+        const HOST = "a79843226e9240508af507d9ded28198.s1.eu.hivemq.cloud";
+        const PORT = 8884; 
+        const USER = "Visiteurs"; // Ton utilisateur limité
+        const PASS = "Visiteur2026";     // Son mot de passe
+
+        let lastMessageTime = null; // Stocke l'heure du dernier message reçu
+        const TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes en millisecondes
+
+        const client = new Paho.MQTT.Client(HOST, PORT, "/mqtt", "WebClient_" + Math.random().toString(16).slice(2, 5));
+
+        client.onMessageArrived = (msg) => {
+            const topic = msg.destinationName.toLowerCase();
+            const payload = msg.payloadString.toUpperCase();
+            
+            // On met à jour l'heure de réception
+            lastMessageTime = new Date().getTime();
+            updateCOMLed("ON");
+
+            if (topic.includes("radiateur")) {
+                updateLED("rad-led", payload);
+            } else if (topic.includes("chauffeau")) {
+                updateLED("ce-led", payload);
+            } else if (topic.includes("test")) {
+                updateLED("test-led", payload);
+            }
+            updateGlobalStatus();
+        };
+
+        client.onConnectionLost = (responseObject) => {
+            document.getElementById("connection-status").innerHTML = "❌ Connexion perdue";
+            updateCOMLed("OFF");
+        };
+
+        function updateLED(id, state) {
+            const el = document.getElementById(id);
+            el.innerHTML = state;
+            el.className = (state === "ON") ? "led led-on" : "led led-off";
+        }
+
+        function updateCOMLed(state) {
+            const el = document.getElementById("com-led");
+            el.innerHTML = state;
+            el.className = (state === "ON") ? "led led-on" : "led led-off";
+        }
+
+        function updateGlobalStatus() {
+            const isRadOn = document.getElementById("rad-led").innerHTML === "ON";
+            const isCeOn = document.getElementById("ce-led").innerHTML === "ON";
+            const mainLabel = document.getElementById("main-status");
+            
+            if (isRadOn || isCeOn) {
+                mainLabel.innerHTML = "SÉCHAGE EN COURS...";
+                mainLabel.className = "status-on";
+            } else {
+                mainLabel.innerHTML = "SYSTÈME À L'ARRÊT";
+                mainLabel.className = "status-off";
+            }
+        }
+
+        // --- SURVEILLANCE DES 30 MINUTES ---
+        setInterval(() => {
+            if (lastMessageTime) {
+                const currentTime = new Date().getTime();
+                if (currentTime - lastMessageTime > TIMEOUT_MS) {
+                    updateCOMLed("OFF");
+                }
+            }
+        }, 5000); // Vérifie toutes les 5 secondes
+
+        client.connect({
+            useSSL: true,
+            userName: USER,
+            password: PASS,
+            onSuccess: () => {
+                document.getElementById("connection-status").innerHTML = "● Connecté au Cloud";
+                document.getElementById("connection-status").style.color = "#4CAF50";
+                client.subscribe("logo/maison/#");
+            }
+        });
+    </script>
+</body>
+</html>

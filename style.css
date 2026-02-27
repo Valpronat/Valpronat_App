@@ -1,0 +1,114 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: #ffffff;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    gap: 15px;
+}
+
+.logo-valpronat-header {
+    height: 35px;
+    object-fit: contain;
+}
+
+.header-banner {
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+
+#connection-status {
+    text-align: right;
+    padding: 5px 15px;
+    font-size: 10px;
+    color: #666;
+    font-weight: bold;
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+
+.status-grid {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 500px;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    gap: 5px;
+}
+
+.indicator-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.label-box {
+    border: 1px solid black;
+    background: white;
+    padding: 8px 2px;
+    margin-bottom: 12px;
+    width: 90%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.led {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    border: 3px solid #333;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.led-on { background-color: #4CAF50; border-color: #1b5e20; box-shadow: 0 0 15px #4CAF50; }
+.led-off { background-color: #d91e18; border-color: #7f0000; }
+
+.visuals-single {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.sechage-banner-single {
+    border: 1px solid #ccc;
+    width: 85%;
+    max-height: 200px;
+    object-fit: contain;
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 5px 8px rgba(0,0,0,0.1);
+}
+
+h2 { margin-top: 25px; letter-spacing: 2px; font-weight: 800; font-size: 24px; color: #333; }
+
+#main-status { font-weight: bold; margin-bottom: 40px; font-size: 18px; }
+.status-on { color: #4CAF50; }
+.status-off { color: #f44336; }
